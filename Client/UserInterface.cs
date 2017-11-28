@@ -376,7 +376,276 @@ namespace Client
             } while (choice != 4);
         }
 
-       
+        public void AdminWindow(ClientAccount ca, IWorkgroupService workgroupProxy)
+        {
+            User u = workgroupProxy.FindUser(ca.Username);
+            Console.WriteLine("***********************");
+            Console.WriteLine("Hello admin");
+
+            int choice = 0;
+            bool ok = false;
+            do
+            {
+                Console.WriteLine("1. See requests for groups");
+                Console.WriteLine("2. See requests for vacation");
+                Console.WriteLine("3. Name boss");
+                Console.WriteLine("4. Change password");
+                Console.WriteLine("5. Logout");
+
+                do
+                {
+                    Console.Write("Choice: ");
+
+                    if (!Int32.TryParse(Console.ReadLine(), out choice))
+                    {
+                        Console.WriteLine("Choice is a number!");
+                    }
+                    ok = true;
+                } while (ok != true);
+
+                switch (choice)
+                {
+                    case 1:
+                        {
+                            List<User> list = workgroupProxy.UsersForJoin();
+                            int i = 0;
+
+                            int choice2;
+
+                            int no = list.Count;
+                            if (no != 0)
+                            {
+                                Console.WriteLine("Put users in group:");
+                                foreach (User user in list)
+                                {
+                                    i++;
+                                    Console.WriteLine("{0}. {1}", i, user.Username);
+                                }
+
+                                do
+                                {
+                                    bool correct = false;
+                                    string username;
+                                    int teamId;
+
+                                    do
+                                    {
+                                        Console.WriteLine("Enter username of user you want to put in group:");
+                                        username = Console.ReadLine();
+
+                                        foreach (User user in list)
+                                        {
+                                            if (user.Username == username)
+                                            {
+                                                correct = true;
+                                            }
+                                        }
+
+                                        if (correct == false)
+                                        {
+                                            Console.WriteLine("You put wrong username!");
+                                        }
+                                    } while (correct != true);
+
+                                    do
+                                    {
+                                        Console.WriteLine("In which team (1, 2, 3, 4, 5...) you want to put him?");
+
+                                        if (Int32.TryParse(Console.ReadLine(), out teamId))
+                                        {
+                                            correct = true;
+                                        }
+                                        else
+                                        {
+                                            Console.WriteLine("Name of a team is number!");
+                                            correct = false;
+                                        }
+
+                                    } while (correct != true);
+
+                                    try
+                                    {
+                                        workgroupProxy.AddToTeam(username, teamId);
+                                    }
+                                    catch (FaultException fe)
+                                    {
+                                        Console.WriteLine(fe.Reason);
+                                    }
+                                    Console.WriteLine("For exit, press 0");
+                                    choice2 = Int32.Parse(Console.ReadLine());
+                                } while (choice2 != 0);
+                            }
+                            else
+                            {
+                                Console.WriteLine("There are no requests for joining to group.");
+                                break;
+                            }
+                            break;
+                        }
+                    case 2:
+                        {
+                            List<Request> list = workgroupProxy.AllRequests(u.Username);
+                            int no = list.Count;
+
+                            if (no != 0)
+                            {
+                                Console.WriteLine("**********REQUESTS********");
+                                foreach (Request r in list)
+                                {
+                                    Console.WriteLine("User that asked for vacation: " + r.UserId);
+                                    Console.WriteLine("Id: " + r.Id);
+                                    Console.WriteLine("Starting date: " + r.StartDate);
+                                    Console.WriteLine("Ending date: " + r.EndDate);
+                                }
+                                Console.WriteLine("**************************************");
+                                Console.WriteLine("1. Approve request");
+                                Console.WriteLine("2. Deny request");
+                                Console.WriteLine("Choice: ");
+                                int choice2 = Int32.Parse(Console.ReadLine());
+
+                                if (choice2 == 1)
+                                {
+                                    Console.WriteLine("Input ID of request you want to approve");
+                                    int id;
+
+                                    if (!Int32.TryParse(Console.ReadLine(), out id))
+                                    {
+                                        Console.WriteLine("ID is number!");
+                                        break;
+                                    }
+
+                                    try
+                                    {
+                                        workgroupProxy.ApproveRequest(id, ca.Username);
+                                    }
+                                    catch (FaultException fe)
+                                    {
+                                        Console.WriteLine(fe.Reason);
+                                    }
+                                }
+                                else if (choice2 == 2)
+                                {
+                                    Console.WriteLine("Input ID of request you want to deny");
+                                    int id;
+
+                                    if (!Int32.TryParse(Console.ReadLine(), out id))
+                                    {
+                                        Console.WriteLine("ID is number!");
+                                        break;
+                                    }
+
+                                    try
+                                    {
+                                        workgroupProxy.ApproveRequest(id, ca.Username);
+                                    }
+                                    catch (FaultException fe)
+                                    {
+                                        Console.WriteLine(fe.Reason);
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                Console.WriteLine("There are no requests for vacation.");
+                            }
+                            break;
+                        }
+                    case 3:
+                        {
+                            Console.WriteLine("List of workers");
+                            List<User> list = workgroupProxy.AllUsers();
+                            foreach (User user in list)
+                            {
+                                Console.WriteLine("username: {0} team: {1}", user.Username, user.Team);
+                            }
+
+                            string boss;
+                            int team;
+                            bool correct = false;
+
+                            do
+                            {
+                                Console.WriteLine("Who do you want to name as boss?");
+                                boss = Console.ReadLine();
+
+                                foreach (User user in list)
+                                {
+                                    if (user.Username == boss)
+                                    {
+                                        correct = true;
+                                    }
+                                }
+
+                                if (correct == false)
+                                {
+                                    Console.WriteLine("You put wrong username!");
+                                }
+                            } while (correct != true);
+
+
+                            do
+                            {
+                                Console.WriteLine("He/She will be boss of which team?");
+
+                                if (Int32.TryParse(Console.ReadLine(), out team))
+                                {
+                                    correct = true;
+                                }
+                                else
+                                {
+                                    Console.WriteLine("Name of a team is number!");
+                                    correct = false;
+                                }
+
+                            } while (correct != true);
+
+                            try
+                            {
+                                workgroupProxy.NameBoss(boss, team);
+                            }
+                            catch (FaultException fe)
+                            {
+                                Console.WriteLine(fe.Reason);
+                            }
+                            break;
+                        }
+
+                    case 4:
+                        {
+                            bool correctpass = false;
+                            do
+                            {
+                                Console.WriteLine("Input old password");
+                                string oldpass = Console.ReadLine();
+                                if (u.Password != oldpass)
+                                {
+                                    Console.WriteLine("You entered wrong password.");
+                                }
+
+                                Console.WriteLine("Input new password");
+                                string newpass = Console.ReadLine();
+                                try
+                                {
+                                    correctpass = workgroupProxy.ChangePassword(u.Username, oldpass, newpass);
+                                }
+                                catch (FaultException fe)
+                                {
+                                    Console.WriteLine(fe.Reason);
+                                }
+                            } while (correctpass == false);
+                            break;
+                        }
+                    case 5:
+                        {
+                            bool loggedout = false;
+                            loggedout = workgroupProxy.Logout(u.Username);
+                            Environment.Exit(0);
+                            break;
+                        }
+                }
+            } while (choice != 5);
+
+        }
 
     }
 }
