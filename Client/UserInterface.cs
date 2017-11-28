@@ -80,7 +80,7 @@ namespace Client
                         LoginDTO loginInformation = new LoginDTO();
 
                         InputCredentials(clientAccount);
-                        if(clientAccount.RequireSafeLogin)
+                        if (clientAccount.RequireSafeLogin)
                         {
                             Console.WriteLine("Server demands safe login. Input answers to security questions in order to log in");
                             Console.WriteLine(clientAccount.SecurityQuestionOne);
@@ -89,9 +89,9 @@ namespace Client
                             answerTwo = Console.ReadLine();
                         }
 
-                        if(connectionHandler.workgroupChannel.Credentials.UserName.UserName != null) //Reopen channel for new credentials
+                        if (connectionHandler.workgroupChannel.Credentials.UserName.UserName != null) //Reopen channel for new credentials
                         {
-                            if(connectionHandler.CloseWorkgroupChannel()) 
+                            if (connectionHandler.CloseWorkgroupChannel())
                             {
                                 connectionHandler.OpenWorkgroupChannel();
                                 connectionHandler.workgroupChannel.Credentials.UserName.UserName = clientAccount.Username;
@@ -118,32 +118,32 @@ namespace Client
                         {
                             Console.WriteLine(fe.Message, fe.Reason);
                         }*/
-                        catch(Exception e)
+                        catch (Exception e)
                         {
-                            if(e is FaultException)
+                            if (e is FaultException)
                             {
                                 Console.WriteLine(e.Message);
                             }
-                            if(e is ArgumentException)
+                            if (e is ArgumentException)
                             {
                                 Console.WriteLine(e.Message);
                             }
                         }
 
-                        if(loginInformation.Authenticated)
+                        if (loginInformation.Authenticated)
                         {
                             clientAccount.Authenticated = true;
                             clientAccount.ClientGroup = loginInformation.UserGroup;
                         }
                         else
                         {
-                            if(loginInformation.SecurityQuestionOne != null)
+                            if (loginInformation.SecurityQuestionOne != null)
                             {
                                 clientAccount.RequireSafeLogin = true;
                                 clientAccount.SecurityQuestionOne = loginInformation.SecurityQuestionOne;
                                 clientAccount.SecurityQuestionTwo = loginInformation.SecurityQuestionTwo;
                             }
-                            
+
                             Console.WriteLine("Failed to log in");
                         }
 
@@ -270,7 +270,7 @@ namespace Client
 
                             break;
                         }
-                    
+
                     case 3:
                         {
                             bool correctpass = false;
@@ -409,7 +409,7 @@ namespace Client
                         {
                             List<User> list = workgroupProxy.UsersForJoin();
                             int i = 0;
-                            
+
                             int choice2;
 
                             int no = list.Count;
@@ -461,8 +461,8 @@ namespace Client
                                             correct = false;
                                         }
 
-                                    } while(correct != true);
-                                    
+                                    } while (correct != true);
+
                                     try
                                     {
                                         workgroupProxy.AddToTeam(username, teamId);
@@ -554,11 +554,11 @@ namespace Client
                         {
                             Console.WriteLine("List of workers");
                             List<User> list = workgroupProxy.AllUsers();
-                            foreach(User user in list)
+                            foreach (User user in list)
                             {
                                 Console.WriteLine("username: {0} team: {1}", user.Username, user.Team);
                             }
-                            
+
                             string boss;
                             int team;
                             bool correct = false;
@@ -603,11 +603,11 @@ namespace Client
                             {
                                 workgroupProxy.NameBoss(boss, team);
                             }
-                            catch(FaultException fe)
+                            catch (FaultException fe)
                             {
                                 Console.WriteLine(fe.Reason);
                             }
-                         break;
+                            break;
                         }
 
                     case 4:
@@ -621,7 +621,7 @@ namespace Client
                                 {
                                     Console.WriteLine("You entered wrong password.");
                                 }
-                                
+
                                 Console.WriteLine("Input new password");
                                 string newpass = Console.ReadLine();
                                 try

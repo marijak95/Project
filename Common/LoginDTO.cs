@@ -14,7 +14,7 @@ namespace Common
 
         [DataMember]
         public string SecurityQuestionTwo { get; set; }
-        
+
         [DataMember]
         public string UserGroup { get; set; }
 

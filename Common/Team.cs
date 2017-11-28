@@ -19,6 +19,6 @@ namespace Common
         public int TeamName { get; set; }
         [DataMember]
         public int BossId { get; set; }
-        
+
     }
 }
